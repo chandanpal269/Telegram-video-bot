@@ -459,12 +459,20 @@ def refresh_free_usage_window(
     return changed
 
 
-def free_usage_available(record: dict[str, Any], now: datetime) -> bool:
-    """Return whether the user has not consumed the current 24-hour allowance."""
+def free_usage_available(
+    record: dict[str, Any], now: datetime, limit: int = 1
+) -> bool:
+    """Return whether the user still has free video views available."""
     started_at = parse_datetime(record.get("usage_started_at"))
+    usage_count = int(record.get("usage_count", 0) or 0)
+
     if started_at is None:
-        return int(record.get("usage_count", 0) or 0) < 1
-    return now < started_at + FREE_USAGE_WINDOW
+        return usage_count < limit
+
+    if now >= started_at + FREE_USAGE_WINDOW:
+        return True
+
+    return usage_count < limit
 
 
 async def reserve_video_access(
