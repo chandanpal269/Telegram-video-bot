@@ -488,7 +488,7 @@ async def reserve_video_access(
             return False, False
 
         record["usage_date"] = now.date().isoformat()
-        record["usage_count"] = 1
+        record["usage_count"] = int(record.get("usage_count", 0)) + 1
         record["usage_started_at"] = now.isoformat()
         record["usage_reset_at"] = (now + FREE_USAGE_WINDOW).isoformat()
         save_user_state(context)
