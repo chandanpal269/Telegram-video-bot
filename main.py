@@ -483,23 +483,35 @@ async def reserve_video_access(
     Returns (allowed, is_premium). The reservation is persisted before the
     video request so concurrent updates cannot exceed the daily limit.
     """
+    async def reserve_video_access(
+    context: ContextTypes.DEFAULT_TYPE, user_id: int
+) -> tuple[bool, bool]:
+    """Reserve one free daily view, or allow unlimited premium access."""
     async with get_user_lock(context):
         record = get_user_record(context, user_id)
+
         if is_premium_user(record):
             save_user_state(context)
             return True, True
 
         now = utc_now()
         refresh_free_usage_window(record, now)
+
         limit = int(get_settings(context).get("free_daily_limit", 1) or 1)
-if not free_usage_available(record, now, limit):
+
+        if not free_usage_available(record, now, limit):
             save_user_state(context)
             return False, False
 
         record["usage_date"] = now.date().isoformat()
-        record["usage_count"] = int(record.get("usage_count", 0)) + 1
-        record["usage_started_at"] = now.isoformat()
-        record["usage_reset_at"] = (now + FREE_USAGE_WINDOW).isoformat()
+        record["usage_count"] = int(record.get("usage_count", 0) or 0) + 1
+        record["usage_started_at"] = (
+            record.get("usage_started_at") or now.isoformat()
+        )
+        record["usage_reset_at"] = (
+            parse_datetime(record["usage_started_at"]) + FREE_USAGE_WINDOW
+        ).isoformat()
+
         save_user_state(context)
         return True, False
 
