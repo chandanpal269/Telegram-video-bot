@@ -491,7 +491,7 @@ async def reserve_video_access(
 
         now = utc_now()
         refresh_free_usage_window(record, now)
-        if not free_usage_available(record, now):
+        if not free_usage_available(record, now, get_free_video_limit(context)):
             save_user_state(context)
             return False, False
 
