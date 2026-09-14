@@ -1110,11 +1110,12 @@ async def send_premium_offer(
                 reply_markup=payment_keyboard(plan_key, settings),
             )
         get_pending_payment_plans(context)[message.chat_id] = plan_key
-    except Exception:
-LOGGER.exception("Could not send configured Premium QR image")
-await message.reply_text(
-    f"QR error: {type(exc).__name__}: {exc}"
-)
+        except Exception as exc:
+        LOGGER.exception("Could not send configured Premium QR image")
+        await message.reply_text(
+            f"QR error: {type(exc).__name__}: {exc}"
+        )
+
 
 
 
