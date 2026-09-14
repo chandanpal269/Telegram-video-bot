@@ -505,6 +505,14 @@ async def reserve_video_access(
 
         record["usage_date"] = now.date().isoformat()
         record["usage_count"] = int(record.get("usage_count", 0) or 0) + 1
+        record["usage_started_at"] = now.isoformat()
+        record["usage_reset_at"] = (now + FREE_USAGE_WINDOW).isoformat()
+
+        save_user_state(context)
+        return True, False
+
+        record["usage_date"] = now.date().isoformat()
+        record["usage_count"] = int(record.get("usage_count", 0) or 0) + 1
         record["usage_started_at"] = (
             record.get("usage_started_at") or now.isoformat()
         )
