@@ -1111,10 +1111,11 @@ async def send_premium_offer(
             )
         get_pending_payment_plans(context)[message.chat_id] = plan_key
     except Exception:
-        LOGGER.exception("Could not send configured Premium QR image")
-        await message.reply_text(
-            "Premium payment is temporarily unavailable. Please contact the admin."
-        )
+LOGGER.exception("Could not send configured Premium QR image")
+await message.reply_text(
+    f"QR error: {type(exc).__name__}: {exc}"
+)
+
 
 
 def get_pending_payment_for_user(
