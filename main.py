@@ -1943,7 +1943,8 @@ def build_application(
     )
     application.add_handler(CommandHandler("set_qr", set_qr_command))
     application.add_handler(CommandHandler("set_upi", set_upi_command))
-    application.add_handler(CommandHandler("admin", admin_command))
+    application.add_handler(CommandHandler("admin", admin_command)) 
+    application.add_handler(CommandHandler("broadcast", broadcast_command))
     application.add_handler(
         CallbackQueryHandler(check_membership, pattern=f"^{CHECK_MEMBERSHIP_CALLBACK}$")
     )
