@@ -1780,7 +1780,40 @@ async def admin_command(
             "/set_ad_link <url|off>\n"
             "/set_ad_message <message>"
         )
+async def broadcast_command(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Admin command: broadcast a message to all registered users."""
+    if not await is_admin(update, context):
+        return
 
+    message = update.effective_message
+    if message is None:
+        return
+
+    text = " ".join(context.args).strip()
+    if not text:
+        await message.reply_text("Usage: /broadcast <message>")
+        return
+
+    users = load_user_state(context)
+
+    sent = 0
+    failed = 0
+
+    for user_id in users:
+        try:
+            await context.bot.send_message(
+                chat_id=int(user_id),
+                text=text,
+            )
+            sent += 1
+        except Exception:
+            failed += 1
+
+    await message.reply_text(
+        f"Broadcast complete.\nSent: {sent}\nFailed: {failed}"
+    )
 
 def is_http_url(value: str) -> bool:
     """Validate an ad URL without accepting arbitrary schemes."""
