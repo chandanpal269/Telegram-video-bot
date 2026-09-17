@@ -1623,7 +1623,42 @@ async def user_status_command(
         f"Successful referrals: {record.get('referral_count', 0)}"
     )
 
+async def broadcast_command(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Admin command: /broadcast <message>."""
+    if not await is_admin(update, context):
+        return
 
+    message = update.effective_message
+
+    if message is None or not context.args:
+        if message:
+            await message.reply_text("Usage: /broadcast <message>")
+        return
+
+    broadcast_text = " ".join(context.args).strip()
+    users = get_users(context)
+
+    sent = 0
+    failed = 0
+
+    for user_id in list(users.keys()):
+        try:
+            await context.bot.send_message(
+                chat_id=int(user_id),
+                text=broadcast_text,
+            )
+            sent += 1
+            await asyncio.sleep(0.1)
+        except Exception:
+            failed += 1
+
+    await message.reply_text(
+        f"📢 Broadcast completed.\n\n"
+        f"✅ Sent: {sent}\n"
+        f"❌ Failed/blocked: {failed}"
+            )
 async def referrals_command(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
